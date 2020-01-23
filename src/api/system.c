@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <ctype.h>
+#include <stdbool.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include "api.h"
@@ -289,27 +290,57 @@ static int f_sleep(lua_State *L) {
 
 
 static int f_fuzzy_match(lua_State *L) {
-  const char *str = luaL_checkstring(L, 1);
-  const char *ptn = luaL_checkstring(L, 2);
-  int score = 0;
-  int run = 0;
+  const char *haystack = luaL_checkstring(L, 1);
+  const char *needle = luaL_checkstring(L, 2);
+  const char *needle_start = needle;
 
-  while (*str && *ptn) {
-    while (*str == ' ') { str++; }
-    while (*ptn == ' ') { ptn++; }
-    if (tolower(*str) == tolower(*ptn)) {
-      score += run;
-      run++;
-      ptn++;
-    } else {
-      score--;
-      run = 0;
+  const char *needle_last_match_pos = needle_start;
+
+  int score = -strlen(haystack);
+  if (score > 0) { score = 0; }
+  int consecutive = 0;
+
+  while (*haystack) {
+    while (*haystack == ' ') {
+      haystack++;
+      consecutive = 0;
     }
-    str++;
-  }
-  if (*ptn) { return 0; }
 
-  lua_pushnumber(L, score - (int) strlen(str));
+    bool matched_something_new = false;
+    needle = needle_start;
+    while (*needle) {
+      while (*needle == ' ') {
+        needle++;
+        consecutive = 0;
+      }
+
+      if (tolower(*haystack) == tolower(*needle)) {
+        if (needle > needle_last_match_pos) {
+          matched_something_new = true;
+        }
+        consecutive++;
+
+        score += 1 + (consecutive + 1) * consecutive;
+
+        needle_last_match_pos = needle;
+        needle++;
+        haystack++;
+      } else {
+        consecutive = 0;
+        needle++;
+      }
+    }
+
+    if (!matched_something_new) {
+      score--;
+    }
+
+    if (*haystack) {
+      haystack++;
+    }
+  }
+
+  lua_pushnumber(L, score);
   return 1;
 }
 

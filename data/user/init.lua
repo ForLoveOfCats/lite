@@ -11,3 +11,4 @@ local style = require "core.style"
 -- key binding:
 -- keymap.add { ["ctrl+escape"] = "core:quit" }
 
+require "user.LiteZig.language_zig"
