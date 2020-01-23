@@ -5,11 +5,9 @@ syntax.add {
   files = { "%.zig$" },
   comment = "//",
   patterns = {
-    --The commented out patterns rely on style additions yet to be upstreamed
-    --https://github.com/rxi/lite/pull/10
     { pattern = "//[^/].-\n",               type = "comment"    },
     { pattern = "//[^/]",                   type = "comment"    },
-    --{ pattern = "///.-\n",                  type = "doccomment" },
+    { pattern = "///.-\n",                  type = "doccomment" },
     { pattern = "\\.-\n",                   type = "string"     },
     { pattern = { '"', '"', '\\' },         type = "string"     },
     { pattern = { "'", "'", '\\' },         type = "string"     },
@@ -17,7 +15,7 @@ syntax.add {
     { pattern = "-?%d+[%d%.eE]*",           type = "number"     },
     { pattern = "-?%.?%d+",                 type = "number"     },
     { pattern = "[%+%-=/%*%^%%<>!~|&:,%.;]", type = "operator"   },
-    --{ pattern = "[%[%]%(%){}]",             type = "bracket"    },
+    { pattern = "[%[%]%(%){}]",             type = "bracket"    },
     { pattern = "[%a_][%w_]*%f[(]",         type = "function"   },
     { pattern = "@[%a_][%w_]*",             type = "keyword2"   },
     { pattern = "[%a_][%w_]*",              type = "symbol"     },
