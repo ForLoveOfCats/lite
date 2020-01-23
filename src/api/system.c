@@ -294,10 +294,7 @@ static int f_fuzzy_match(lua_State *L) {
   const char *needle = luaL_checkstring(L, 2);
   const char *needle_start = needle;
 
-  const char *needle_last_match_pos = needle_start;
-
-  int score = -strlen(haystack);
-  if (score > 0) { score = 0; }
+  int score = -strlen(haystack)/2;
   int consecutive = 0;
 
   while (*haystack) {
@@ -306,7 +303,6 @@ static int f_fuzzy_match(lua_State *L) {
       consecutive = 0;
     }
 
-    bool matched_something_new = false;
     needle = needle_start;
     while (*needle) {
       while (*needle == ' ') {
@@ -315,24 +311,14 @@ static int f_fuzzy_match(lua_State *L) {
       }
 
       if (tolower(*haystack) == tolower(*needle)) {
-        if (needle > needle_last_match_pos) {
-          matched_something_new = true;
-        }
+        score += consecutive*consecutive;
         consecutive++;
-
-        score += 1 + (consecutive + 1) * consecutive;
-
-        needle_last_match_pos = needle;
         needle++;
         haystack++;
       } else {
         consecutive = 0;
         needle++;
       }
-    }
-
-    if (!matched_something_new) {
-      score--;
     }
 
     if (*haystack) {
